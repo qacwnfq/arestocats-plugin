@@ -1,0 +1,5 @@
+<?jelly escape-by-default='true'?>
+<div>
+   aRESTocats-plugin:
+      This plugin is intended for use with the REST integration testing toolkit arestocats.
+</div>
