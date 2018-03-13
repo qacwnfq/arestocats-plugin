@@ -28,6 +28,11 @@
          <artifactId>json</artifactId>
          <version>20171018</version>
       </dependency>
+      <dependency>
+         <groupId>org.jenkins-ci.plugins</groupId>
+         <artifactId>structs</artifactId>
+         <version>1.14</version>
+      </dependency>
       <!-- https://mvnrepository.com/artifact/net.sf.opencsv/opencsv -->
       <dependency>
          <groupId>net.sf.opencsv</groupId>

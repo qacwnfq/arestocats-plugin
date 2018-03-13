@@ -17,6 +17,7 @@ import org.apache.tools.ant.types.FileSet;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.jenkinsci.Symbol;
 
 import java.io.File;
 import java.io.IOException;
@@ -179,7 +180,7 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
 
       private static final long serialVersionUID = 1L;
 
-      @Extension
+      @Extension @Symbol("arestocats")
       public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
             public String getDisplayName() {
                   return "aRESTocats";
