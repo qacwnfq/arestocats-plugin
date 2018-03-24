@@ -39,7 +39,7 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
       private final String dataFilesPattern;
       private final int numBuilds;
       private int currentNumber = 0;
-      private JSONArray arestocatsData;
+      transient private JSONArray arestocatsData;
       private String results = "{}";
 
       /**
