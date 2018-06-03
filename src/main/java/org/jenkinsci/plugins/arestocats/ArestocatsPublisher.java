@@ -21,10 +21,8 @@ import org.jenkinsci.Symbol;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.logging.Logger;
 import jenkins.tasks.SimpleBuildStep;
-import org.kohsuke.stapler.DataBoundSetter;
 
 import org.json.*;
 
@@ -34,23 +32,21 @@ import org.json.*;
 public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
 
       private static transient final Logger LOGGER = Logger.getLogger(ArestocatsPublisher.class.getName());
-      private static final String arestocatsMetricsPath = "arestocatsMetrics";
+      private static final String metricsPath = "metricsPath";
+      private static final String arestocatsDataPath = "arestocats";
+      private static final String resultsPath = "resultsPath";
       /** * {@link FileSet} "includes" string, like "foo/bar/*.xml" */
-      private final String dataFilesPattern;
+      private final String metricDatafilesPattern;
+      private final String resultsDatafilesPattern;
       private final int numBuilds;
       private int currentNumber = 0;
       transient private JSONArray arestocatsData;
       private String results = "{}";
 
-      /**
-       * If true, don't throw exception on missing test results or no files found.
-       */
-      // TODO probably remove, since it is not used
-      private boolean allowEmptyResults;
-
       @DataBoundConstructor
-      public ArestocatsPublisher(String dataFilesPattern, Integer numBuilds) {
-            this.dataFilesPattern = dataFilesPattern.trim();
+      public ArestocatsPublisher(String metricDatafilesPattern, String resultsDatafilesPattern, Integer numBuilds) {
+            this.metricDatafilesPattern = metricDatafilesPattern.trim();
+            this.resultsDatafilesPattern = resultsDatafilesPattern.trim();
             int _numBuilds;
             try {
                   _numBuilds = numBuilds;
@@ -71,40 +67,40 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
                   throws InterruptedException, IOException {
             this.currentNumber = build.getNumber();
             recordArestocatsData( build, workspace );
-            this.results = createMetricsStringForGoogleCharts( build, workspace);
-            build.addAction( new ArestocatsAction( build, this.results ) );
+            this.resultsPath = createMetricsStringForGoogleCharts( build, workspace);
+            build.addAction( new ArestocatsAction( build, this.resultsPath) );
             build.setResult( Result.SUCCESS );
       }
 
 
       FilePath getCategoryFilePath( Run<?, ?> build, String category) throws IOException, InterruptedException {
                   File buildDir = new File( build.getRootDir().getPath() );
-                  File arestocatsMetricsDir = new File( buildDir, arestocatsMetricsPath );
+                  File arestocatsMetricsDir = new File( buildDir, metricsPath);
                   File buildFile = new File( arestocatsMetricsDir, category + ".json" );
                   return new FilePath( buildFile );
       }
 
       JSONObject appendPreviousMetricsToCurrent(JSONObject metrics, JSONObject previous) {
             try {
-                  for( int i = 0; i < previous.getJSONArray( "metrics" ).length(); i++ ) {
-                        for( int j = 0; j < metrics.getJSONArray( "metrics" ).length(); j++ ) {
-                              if (previous.getJSONArray( "metrics" ).getJSONObject( i ).getString( "name" ).equals(
-                                          metrics.getJSONArray( "metrics" ).getJSONObject( j ).getString( "name" ) ) ) {
-                                    JSONArray values = previous.getJSONArray( "metrics" ).getJSONObject( i ).getJSONArray( "values" );
-                                    values.put(metrics.getJSONArray( "metrics" ).getJSONObject( j ).getDouble( "value" ) );
+                  for( int i = 0; i < previous.getJSONArray( "metricsPath" ).length(); i++ ) {
+                        for( int j = 0; j < metrics.getJSONArray( "metricsPath" ).length(); j++ ) {
+                              if (previous.getJSONArray( "metricsPath" ).getJSONObject( i ).getString( "name" ).equals(
+                                          metrics.getJSONArray( "metricsPath" ).getJSONObject( j ).getString( "name" ) ) ) {
+                                    JSONArray values = previous.getJSONArray( "metricsPath" ).getJSONObject( i ).getJSONArray( "values" );
+                                    values.put(metrics.getJSONArray( "metricsPath" ).getJSONObject( j ).getDouble( "value" ) );
                                     while( values.length() > this.numBuilds ) {
                                           values.remove(0);
                                     }
-                                    metrics.getJSONArray( "metrics" ).getJSONObject( j ).put( "values", values );
+                                    metrics.getJSONArray( "metricsPath" ).getJSONObject( j ).put( "values", values );
                               }
                         }
                   }
             } catch (JSONException e) {
-                  for( int j = 0; j < metrics.getJSONArray( "metrics" ).length(); j++ ) {
-                        double value = metrics.getJSONArray( "metrics" ).getJSONObject( j ).getDouble( "value" );
+                  for( int j = 0; j < metrics.getJSONArray( "metricsPath" ).length(); j++ ) {
+                        double value = metrics.getJSONArray( "metricsPath" ).getJSONObject( j ).getDouble( "value" );
                         JSONArray values = new JSONArray();
                         values.put(value);
-                        metrics.getJSONArray( "metrics" ).getJSONObject(j).put( "values", values );
+                        metrics.getJSONArray( "metricsPath" ).getJSONObject(j).put( "values", values );
                   }
             }
             metrics.put("buildNumber", this.getCurrentNumber());
@@ -117,7 +113,7 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
 
       private void recordArestocatsData( Run<?, ?> build, FilePath workspace )
                   throws IOException, InterruptedException {
-            FilePath[] fps = workspace.list( this.dataFilesPattern );
+            FilePath[] fps = workspace.list( this.metricDatafilesPattern);
             for( FilePath fp : fps ) {
                   JSONObject currentMetrics = new JSONObject( fp.readToString() );
                   String category = currentMetrics.getString( "category" );
@@ -139,7 +135,7 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
             }
             try {
                   File previousFile = new File(previousBuild.getRootDir().getPath());
-                  previousFile = new File( previousFile, arestocatsMetricsPath );
+                  previousFile = new File( previousFile, metricsPath);
                   previousFile = new File( previousFile, category + ".json" );
                   FilePath previousFilePath = new FilePath( previousFile );
                   return new JSONObject( previousFilePath.readToString() );
@@ -153,8 +149,8 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
             return BuildStepMonitor.NONE;
       }
 
-      public String getDataFilesPattern() {
-            return dataFilesPattern;
+      public String getMetricDatafilesPattern() {
+            return metricDatafilesPattern;
       }
 
       public int getNumBuilds() {
@@ -163,19 +159,6 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
 
       public int getCurrentNumber() {
             return currentNumber;
-      }
-
-      /**
-       *
-       * @return the allowEmptyResults
-       */
-      public boolean isAllowEmptyResults() {
-            return allowEmptyResults;
-      }
-
-      @DataBoundSetter
-      public final void setAllowEmptyResults(boolean allowEmptyResults) {
-            this.allowEmptyResults = allowEmptyResults;
       }
 
       private static final long serialVersionUID = 1L;
