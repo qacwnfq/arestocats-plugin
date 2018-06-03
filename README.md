@@ -8,8 +8,8 @@ https://github.com/aixigo/arestocats.
 
 ## Plugin Configuration
 
-The configuration is easy, since only one required and one optional field have to be
+The configuration is easy, since only two required and one optional field have to be
 configured. All other information is taken care of (automatically) by the aRESTocats toolkit.
-See the help icons next to the two respective fields for more information.
+See the help icons next to the three respective fields for more information.
 ![](images/config.jpg?raw=true)
 

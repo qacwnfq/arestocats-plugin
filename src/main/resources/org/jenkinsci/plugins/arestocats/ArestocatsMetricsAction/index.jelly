@@ -1,37 +1,30 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:c="chart" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
-   <l:layout norefresh="true">
-      <st:include it="${it.run}" page="sidepanel.jelly" />
-         <l:main-panel>
-            <h1>${%aRESTocats Metrics}</h1>
+    <l:layout norefresh="true">
+        <st:include it="${it.run}" page="sidepanel.jelly" />
+        <l:main-panel>
+            <h1>${%aRESTocats Metrics for build } ${it.currentBuildNumber}</h1>
             <!--Load the AJAX API for google charts-->
             <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
             <script type="text/javascript">
-               var results = ${it.results};
+               var results = ${it.metrics};
+               console.log(results);
+               var charts = [];
                google.charts.load('current', {'packages':['corechart']});
                google.charts.setOnLoadCallback(drawCharts);
                function drawCharts(){
-                  var charts = [];
-                  results.forEach( ( result, index ) => {
+                  results.forEach( ( result ) => {
                      var data = new google.visualization.DataTable();
                      data.addColumn( 'string', 'X' );
-                     result.metrics.forEach( metric => {
-                         data.addColumn( 'number', metric.name );
-                     } );
-                     var rows = [];
-                     var colors = [];
-                     result.metrics[0].values.forEach( (val, i ) => {
-                        var row = [];
-                        row.push( String( ${it.currentNumber} + i - ( result.metrics[ 0 ].values.length - 1) ) );
-                        result.metrics.forEach( m => {
-                            colors.push( m.color );
-                            row.push( m.values[ i ] );
-                        } );
-                        rows.push( row );
-                     } );
-                     data.addRows( rows );
+                     var testcase = Object.keys(result)[0];
+                     var measurements = result[testcase];
+                     var labeling = measurements["names"];
+                     labeling.forEach( label => {
+                     data.addColumn( 'number', label );
+                     });
+                    data.addRows(measurements["data"]);
                      var options = {
-                         'title': result.category,
+                         'title': testcase,
                          chartArea: {
                              left: 100,
                              width: 600
@@ -41,14 +34,13 @@
                              title: 'Build Nr.'
                          },
                          vAxis: {
-                             title: result.metrics[0].label
-                         },
-                         colors
+                             title:  measurements["label"]
+                         }
                      };
                      var div = document.createElement( "div" );
-                     div.setAttribute( "id", result.category );
+                     div.setAttribute( "id", testcase );
                      document.getElementById( "main-panel" ).appendChild( div );
-                     var chart = new google.visualization.LineChart( document.getElementById( result.category ) );
+                     var chart = new google.visualization.LineChart( document.getElementById( testcase ) );
                      chart.draw( data, options );
                      charts.push( chart );
                   } );
