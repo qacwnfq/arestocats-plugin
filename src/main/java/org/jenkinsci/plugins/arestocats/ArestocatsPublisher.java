@@ -5,7 +5,6 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractProject;
 import hudson.model.Result;
-import hudson.model.Action;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
@@ -36,7 +35,7 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
     /**
      * {@link FileSet} "includes" string, like "foo/bar/*.xml"
      */
-    private final String metricDatafilesPattern;
+    private final String metricsDatafilesPattern;
     private final String resultsDatafilesPattern;
     private final int numBuilds;
     private int currentNumber = 0;
@@ -45,8 +44,8 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
     private String metrics = "{}";
 
     @DataBoundConstructor
-    public ArestocatsPublisher(String metricDatafilesPattern, String resultsDatafilesPattern, Integer numBuilds) {
-        this.metricDatafilesPattern = metricDatafilesPattern.trim();
+    public ArestocatsPublisher(String metricsDatafilesPattern, String resultsDatafilesPattern, Integer numBuilds) {
+        this.metricsDatafilesPattern = metricsDatafilesPattern.trim();
         this.resultsDatafilesPattern = resultsDatafilesPattern.trim();
         int _numBuilds;
         try {
@@ -110,7 +109,7 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
 
     private void recordMetricsData(Run<?, ?> build, FilePath workspace)
             throws IOException, InterruptedException {
-        FilePath[] metricFilePaths = workspace.list(this.metricDatafilesPattern);
+        FilePath[] metricFilePaths = workspace.list(this.metricsDatafilesPattern);
         for (FilePath metricFilePath : metricFilePaths) {
             File targetFile = new File(new File(Paths.BASE, Paths.METRICS), metricFilePath.getName());
             FilePath targetPath = new FilePath(targetFile);
@@ -151,7 +150,7 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
     }
 
     public String getMetricDatafilesPattern() {
-        return metricDatafilesPattern;
+        return metricsDatafilesPattern;
     }
 
     public int getNumBuilds() {
