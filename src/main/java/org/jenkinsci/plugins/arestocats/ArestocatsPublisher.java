@@ -61,9 +61,8 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
     public Collection<? extends Action> getProjectActions(AbstractProject<?, ?> project) {
         // TODO add action that shows latest summary plot on the project page!!
         ArestocatsProjectMetricsAction arestocatsProjectMetricsAction = new ArestocatsProjectMetricsAction(project);
-        ArestocatsProjectResultsAction arestocatsProjectResultsAction = new ArestocatsProjectResultsAction(project)
-        List<? extends Action> projectActions = Arrays.asList(arestocatsProjectResultsAction, arestocatsProjectMetricsAction);
-        return projectActions;
+        ArestocatsProjectResultsAction arestocatsProjectResultsAction = new ArestocatsProjectResultsAction(project);
+        return Arrays.asList(arestocatsProjectResultsAction, arestocatsProjectMetricsAction);
     }
 
     @Override

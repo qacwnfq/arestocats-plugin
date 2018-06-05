@@ -17,34 +17,34 @@ public class ArestocatsReportParserImpl implements ArestocatsReportParser {
 
 
 
-    JSONObject appendPreviousMetricsToCurrent(JSONObject metrics, JSONObject previous) {
-        try {
-            for (int i = 0; i < previous.getJSONArray("metricsPath").length(); i++) {
-                for (int j = 0; j < metrics.getJSONArray("metricsPath").length(); j++) {
-                    if (previous.getJSONArray("metricsPath").getJSONObject(i).getString("name").equals(
-                            metrics.getJSONArray("metricsPath").getJSONObject(j).getString("name"))) {
-                        JSONArray values = previous.getJSONArray("metricsPath").getJSONObject(i).getJSONArray("values");
-                        values.put(metrics.getJSONArray("metricsPath").getJSONObject(j).getDouble("value"));
-                        while (values.length() > this.numberOfBuilds) {
-                            values.remove(0);
-                        }
-                        metrics.getJSONArray("metricsPath").getJSONObject(j).put("values", values);
-                    }
-                }
-            }
-        } catch (JSONException e) {
-            for (int j = 0; j < metrics.getJSONArray("metricsPath").length(); j++) {
-                double value = metrics.getJSONArray("metricsPath").getJSONObject(j).getDouble("value");
-                JSONArray values = new JSONArray();
-                values.put(value);
-                metrics.getJSONArray("metricsPath").getJSONObject(j).put("values", values);
-            }
-        }
-        metrics.put("buildNumber", this.getCurrentNumber());
-        return metrics;
-    }
-
-
+//    JSONObject appendPreviousMetricsToCurrent(JSONObject metrics, JSONObject previous) {
+//        try {
+//            for (int i = 0; i < previous.getJSONArray("metricsPath").length(); i++) {
+//                for (int j = 0; j < metrics.getJSONArray("metricsPath").length(); j++) {
+//                    if (previous.getJSONArray("metricsPath").getJSONObject(i).getString("name").equals(
+//                            metrics.getJSONArray("metricsPath").getJSONObject(j).getString("name"))) {
+//                        JSONArray values = previous.getJSONArray("metricsPath").getJSONObject(i).getJSONArray("values");
+//                        values.put(metrics.getJSONArray("metricsPath").getJSONObject(j).getDouble("value"));
+//                        while (values.length() > this.numberOfBuilds) {
+//                            values.remove(0);
+//                        }
+//                        metrics.getJSONArray("metricsPath").getJSONObject(j).put("values", values);
+//                    }
+//                }
+//            }
+//        } catch (JSONException e) {
+//            for (int j = 0; j < metrics.getJSONArray("metricsPath").length(); j++) {
+//                double value = metrics.getJSONArray("metricsPath").getJSONObject(j).getDouble("value");
+//                JSONArray values = new JSONArray();
+//                values.put(value);
+//                metrics.getJSONArray("metricsPath").getJSONObject(j).put("values", values);
+//            }
+//        }
+//        metrics.put("buildNumber", this.getCurrentNumber());
+//        return metrics;
+//    }
+//
+//
 
 //    private JSONObject loadPreviousArestocatsData(Run<?, ?> build, String category)
 //            throws IOException, InterruptedException {
