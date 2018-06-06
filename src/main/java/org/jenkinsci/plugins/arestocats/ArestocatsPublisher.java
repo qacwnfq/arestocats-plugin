@@ -18,12 +18,9 @@ import org.jenkinsci.Symbol;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.logging.Logger;
 
 import jenkins.tasks.SimpleBuildStep;
-
-import org.json.*;
 
 /**
  * @author fjadebeck
@@ -41,8 +38,7 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
      * {@link FileSet} "includes" string, like "foo/bar/*.xml"
      */
     private String resultsDatafilesPattern = "reports/csv/*.csv";
-    private int numberOfBuilds;
-    private int currentNumber = 0;
+    private int numberOfBuildsToArchive;
 
     @DataBoundConstructor
     public ArestocatsPublisher(String metricsDatafilesPattern, String resultsDatafilesPattern, Integer numBuilds) {
@@ -54,7 +50,7 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
         } catch (NullPointerException e) {
             _numBuilds = 15;
         }
-        this.numberOfBuilds = _numBuilds;
+        this.numberOfBuildsToArchive = _numBuilds;
     }
 
     @Override
@@ -68,24 +64,20 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
     @Override
     public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener)
             throws InterruptedException, IOException {
-        this.currentNumber = build.getNumber();
         Integer returnStatusOfRecording = arestocatsDataRecorder.recordResultsAndMetrics(build, workspace, this.resultsDatafilesPattern, this.metricsDatafilesPattern);
-        Integer returnStatusOfChartHandling = arestocatsChartHandler.registerChartsForResultsAndMetrics(build, this.numberOfBuilds);
+        Integer returnStatusOfChartHandling = arestocatsChartHandler.registerChartsForResultsAndMetrics(build, this.numberOfBuildsToArchive);
         if (Math.min(returnStatusOfRecording, returnStatusOfChartHandling) == new Integer(1)) {
             build.setResult(Result.SUCCESS);
         } else if (Math.min(returnStatusOfRecording, returnStatusOfChartHandling) == new Integer(0)) {
             build.setResult(Result.UNSTABLE);
         }
-        build.setResult(Result.FAILURE);
+        build.setResult(Result.SUCCESS);
+//        build.setResult(Result.FAILURE);
     }
 
 
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
-    }
-
-    public int getCurrentNumber() {
-        return currentNumber;
     }
 
     private static final long serialVersionUID = 1L;

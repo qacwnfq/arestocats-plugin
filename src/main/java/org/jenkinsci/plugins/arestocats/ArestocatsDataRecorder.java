@@ -35,6 +35,8 @@ public class ArestocatsDataRecorder {
      */
     public Integer recordMetricsData(Run<?, ?> build, FilePath workspace, String metricsDatafilesPattern)
             throws IOException, InterruptedException {
+        // ensures the directory exists, even if it is empty
+        new FilePath(new File(new File(build.getRootDir(), Paths.BASE), Paths.METRICS)).mkdirs();
         FilePath[] metricFilePaths = workspace.list(metricsDatafilesPattern);
         for (FilePath metricFilePath : metricFilePaths) {
             File targetFile = new File(new File(Paths.BASE, Paths.METRICS), metricFilePath.getName());
@@ -54,9 +56,11 @@ public class ArestocatsDataRecorder {
      */
     public Integer recordResultsData(Run<?, ?> build, FilePath workspace, String resultsDatafilesPattern)
             throws IOException, InterruptedException {
+        // ensures this directory exists, even if it is empty
+        new FilePath(new File(new File(build.getRootDir(), Paths.BASE), Paths.RESULTS)).mkdirs();
         FilePath[] metricFilePaths = workspace.list(resultsDatafilesPattern);
         for (FilePath metricFilePath : metricFilePaths) {
-            File targetFile = new File(new File(Paths.BASE, Paths.RESULTS), metricFilePath.getName());
+            File targetFile = new File(new File(new File(build.getRootDir(), Paths.BASE), Paths.RESULTS), metricFilePath.getName());
             FilePath targetPath = new FilePath(targetFile);
             metricFilePath.copyTo(targetPath);
         }
