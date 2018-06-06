@@ -4,7 +4,6 @@
       <st:include it="${it.run}" page="sidepanel.jelly" />
          <l:main-panel>
             <h1>${%aRESTocats Results}</h1>
-            ${it.results};
             <!--Load the AJAX API for google charts-->
             <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
             <script type="text/javascript">
@@ -15,15 +14,14 @@
                function drawCharts(){
                   results.forEach( ( result, index ) => {
                      var data = new google.visualization.DataTable();
-                     data.addColumn( 'number', 'X' );
+                     data.addColumn( 'string', 'X' );
                      var testcase = Object.keys(result)[0];
-                     var outcomes = result[testcase];
-                     var rows = []
-                     Object.keys(outcomes).forEach( key => {
-                        data.addColumn( 'number', key );
-                        rows.push(outcomes[key]);
-                     }  )
-                    data.addRows(rows);
+                     var measurements = result[testcase];
+                     var labeling = measurements["outcomes"];
+                     labeling.forEach( label => {
+                     data.addColumn( 'number', label );
+                     });
+                    data.addRows(measurements["data"]);
                      var options = {
                          'title': testcase,
                          chartArea: {

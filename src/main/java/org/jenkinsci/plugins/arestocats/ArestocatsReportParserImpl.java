@@ -69,19 +69,19 @@ public class ArestocatsReportParserImpl implements ArestocatsReportParser {
 
     private JSONObject parseResultsFromString(String resultName, String csvResults, int buildNumber) {
         JSONObject resultObject = new JSONObject();
-        // result files are structured like
-        // failures, successes, skipped, errors\n${failure}, ${success}, ${skipped}, ${error}`;
         String results = csvResults.split("[\\r\\n]+")[1];
         JSONArray outcomes = new JSONArray();
-        outcomes.put("failures").put("successes").put("skipped").put("errors");
+        outcomes.put("skipped").put("errors").put("failed").put("successes");
         JSONArray data = new JSONArray();
-        data.put(buildNumber);
-        data.put(Integer.parseInt(results.split(",")[0].trim()));
-        data.put(Integer.parseInt(results.split(",")[1].trim()));
+        data.put(new Integer(buildNumber).toString());
+        // result files are structured like
+        // failures, successes, skipped, errors\n${failure}, ${success}, ${skipped}, ${error}`;
         data.put(Integer.parseInt(results.split(",")[2].trim()));
         data.put(Integer.parseInt(results.split(",")[3].trim()));
+        data.put(Integer.parseInt(results.split(",")[0].trim()));
+        data.put(Integer.parseInt(results.split(",")[1].trim()));
         resultObject.put("outcomes", outcomes);
-        resultObject.put("data", data);
+        resultObject.put("data", new JSONArray().put(data));
         JSONObject labeledResultObject = new JSONObject();
         labeledResultObject.put(resultName, resultObject);
         return labeledResultObject;
@@ -101,6 +101,16 @@ public class ArestocatsReportParserImpl implements ArestocatsReportParser {
                 boolean resultIsPresent = false;
                 for (int k = 0; k < restructuredArray.length(); ++k) {
                     if (restructuredArray.getJSONObject(k).has(key)) {
+                        restructuredArray
+                                .getJSONObject(k)
+                                .getJSONObject(key)
+                                .getJSONArray("data")
+                                .put(
+                                        result
+                                                .getJSONObject(key)
+                                                .getJSONArray("data")
+                                                .getJSONArray(0)
+                                );
                         resultIsPresent = true;
                         break;
                     }

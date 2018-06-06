@@ -39,7 +39,7 @@ public class ArestocatsDataRecorder {
         new FilePath(new File(new File(build.getRootDir(), Paths.BASE), Paths.METRICS)).mkdirs();
         FilePath[] metricFilePaths = workspace.list(metricsDatafilesPattern);
         for (FilePath metricFilePath : metricFilePaths) {
-            File targetFile = new File(new File(Paths.BASE, Paths.METRICS), metricFilePath.getName());
+            File targetFile = new File(new File(new File(build.getRootDir(), Paths.BASE), Paths.METRICS), metricFilePath.getName());
             FilePath targetPath = new FilePath(targetFile);
             metricFilePath.copyTo(targetPath);
         }
