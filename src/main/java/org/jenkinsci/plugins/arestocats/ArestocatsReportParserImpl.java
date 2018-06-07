@@ -128,7 +128,7 @@ public class ArestocatsReportParserImpl implements ArestocatsReportParser {
 
     public JSONArray parseMetricsFromBuildsJSONArray(Run<?, ?> build, int numberOfBuilds) {
         JSONArray metrics = new JSONArray();
-        List<Run<?, ?>> buildsToParse = new ArrayList()
+        List<Run<?, ?>> buildsToParse = new ArrayList();
         Run<?, ?> previousBuild = build;
         for (int i = 0; i < numberOfBuilds; ++i) {
                 if (previousBuild.getResult() != Result.FAILURE) {
