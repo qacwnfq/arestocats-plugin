@@ -13,24 +13,25 @@ public class ArestocatsResultsAction implements Action {
 
     private final Run<?, ?> build;
 
-    private int numBuilds;
     private String results;
+    private String summary;
 
-    public ArestocatsResultsAction(Run<?, ?> build, String results) {
+    public ArestocatsResultsAction(Run<?, ?> build, String results, String summary) {
         this.build = build;
         this.results = results;
+        this.summary = summary;
+    }
+
+    public String getSummary() {
+        return this.summary;
     }
 
     public String getResults() {
         return this.results;
     }
 
-    public int getNumBuilds() {
-        return numBuilds;
-    }
-
-    public int getCurrentNumber() {
-        return this.build.getNumber();
+    public int getCurrentBuildNumber() {
+        return build.getNumber();
     }
 
     @Override

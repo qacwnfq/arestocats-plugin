@@ -27,7 +27,7 @@ import jenkins.tasks.SimpleBuildStep;
  */
 public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
 
-    private static transient final Logger LOGGER = Logger.getLogger(ArestocatsPublisher.class.getName());
+    // private static transient final Logger LOGGER = Logger.getLogger(ArestocatsPublisher.class.getName());
     private final ArestocatsChartHandler arestocatsChartHandler = new ArestocatsChartHandler();
     private final ArestocatsDataRecorder arestocatsDataRecorder = new ArestocatsDataRecorder();
     /**
@@ -55,7 +55,6 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
 
     @Override
     public Collection<? extends Action> getProjectActions(AbstractProject<?, ?> project) {
-        // TODO add action that shows latest summary plot on the project page!!
         ArestocatsProjectMetricsAction arestocatsProjectMetricsAction = new ArestocatsProjectMetricsAction(project);
         ArestocatsProjectResultsAction arestocatsProjectResultsAction = new ArestocatsProjectResultsAction(project);
         return Arrays.asList(arestocatsProjectResultsAction, arestocatsProjectMetricsAction);
@@ -72,6 +71,7 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
             build.setResult(Result.UNSTABLE);
         }
         build.setResult(Result.SUCCESS);
+        // todo better error codes later!
 //        build.setResult(Result.FAILURE);
     }
 

@@ -3,7 +3,7 @@
    <l:layout norefresh="true">
       <st:include it="${it.run}" page="sidepanel.jelly" />
          <l:main-panel>
-            <h1>${%aRESTocats Results}</h1>
+            <h1>${%aRESTocats Results for build } ${it.currentBuildNumber}</h1>
             <!--Load the AJAX API for google charts-->
             <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
             <script type="text/javascript">
@@ -33,7 +33,7 @@
                              title: 'Build Nr.'
                          },
                          vAxis: {
-                             title: results
+                             title: 'test-cases'
                          }
                      };
                      var div = document.createElement( "div" );

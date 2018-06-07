@@ -40,17 +40,8 @@ public class ArestocatsProjectResultsAction implements Action {
         return "aRESTocatsLatestBuildResults";
     }
 
-    public int getCurrentNumber() {
-        return project.getBuilds().size();
-    }
-
-    public String getProjectName() {
-        return this.project.getName();
-    }
-
     public AbstractProject<?, ?> getProject() {
         return this.project;
     }
-
 
 }

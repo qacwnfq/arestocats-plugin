@@ -1,0 +1,34 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+    <style>
+        #aggregate-build-metrics {
+            margin-top: 1em;
+            margin-left:1em;
+            border: solid;
+            border-collapse: collapse;
+        }
+        #aggregate-build-metrics td {
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-left: 15px;
+            padding-right: 15px;
+            border: solid thin;
+        }
+
+        .all-time {
+            border-bottom: solid;
+        }
+    </style>
+
+    <table id="aggregate-build-metrics">
+        <tbody>
+        <tr id="mttrLast7days" class="mttr 7day">
+            Summary latest aRESTocats results
+        </tr>
+        <tr>
+            ${it.project.summary}
+        </tr>
+        </tbody>
+    </table>
+
+</j:jelly>

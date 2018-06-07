@@ -1,19 +1,18 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:c="chart" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
     <l:layout norefresh="true">
-        <st:include it="${it.run}" page="sidepanel.jelly" />
+        <st:include it="${it.project}" page="sidepanel.jelly" />
         <l:main-panel>
-            <h1>${%aRESTocats Metrics for build } ${it.currentBuildNumber}</h1>
+            <h1>${%Latest aRESTocats Metrics}</h1>
             <!--Load the AJAX API for google charts-->
             <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
             <script type="text/javascript">
                var results = ${it.metrics};
-               console.log(results);
                var charts = [];
                google.charts.load('current', {'packages':['corechart']});
                google.charts.setOnLoadCallback(drawCharts);
                function drawCharts(){
-                  results.forEach( ( result ) => {
+                  results.forEach( ( result, index ) => {
                      var data = new google.visualization.DataTable();
                      data.addColumn( 'string', 'X' );
                      var testcase = Object.keys(result)[0];

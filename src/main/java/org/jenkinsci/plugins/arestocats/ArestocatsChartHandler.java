@@ -13,7 +13,8 @@ public class ArestocatsChartHandler {
 
     public Integer registerChartsForResults(Run<?, ?> build, int numberOfBuilds) {
         String results = arestocatsReportParser.parseResultsFromBuilds(build, numberOfBuilds);
-        build.addAction(new ArestocatsResultsAction(build, results));
+        String summary = arestocatsReportParser.parseResultsSummaryFromBuilds(build, numberOfBuilds);
+        build.addAction(new ArestocatsResultsAction(build, results, summary));
         return new Integer(1);
     }
 

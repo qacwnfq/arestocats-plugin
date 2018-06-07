@@ -1,65 +1,71 @@
 package org.jenkinsci.plugins.arestocats;
 
 import hudson.FilePath;
+import hudson.model.Result;
 import hudson.model.Run;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ArestocatsReportParserImpl implements ArestocatsReportParser {
-    private static transient final Logger LOGGER = Logger.getLogger(ArestocatsReportParserImpl.class.getName());
-
     @Override
     public String parseMetricsFromBuilds(Run<?, ?> build, int numberOfBuilds) {
-        StringBuilder metricsStringBuilder = new StringBuilder();
-        Run<?, ?> previousBuild = build;
-        for (int i = 0; i < numberOfBuilds; ++i) {
-            try {
-                metricsStringBuilder.append(parseMetricsFromBuild(previousBuild));
-            } catch (InterruptedException e) {
+        return parseMetricsFromBuildsJSONArray(build, numberOfBuilds).toString();
+    }
 
-            } catch (IOException e) {
-
-            } finally {
-                previousBuild = previousBuild.getPreviousNotFailedBuild();
-                if (previousBuild == null) {
-                    break;
-                }
+    @Override
+    public String parseResultsSummaryFromBuilds(Run<?, ?> build, int numberOfBuilds) {
+        JSONArray allResults = parseResultsFromBuildsJSONArray(build, numberOfBuilds);
+        for (int i = 0; i < allResults.length(); ++i) {
+            if (allResults.getJSONObject(i).has("summary")) {
+                return allResults.getJSONObject(i).toString();
             }
         }
-        return metricsStringBuilder.toString();
+        return "[]";
     }
 
     @Override
     public String parseResultsFromBuilds(Run<?, ?> build, int numberOfBuilds) {
+        return parseResultsFromBuildsJSONArray(build, numberOfBuilds).toString();
+    }
+
+    public JSONArray parseResultsFromBuildsJSONArray(Run<?, ?> build, int numberOfBuilds) {
         JSONArray results = new JSONArray();
+        List<Run<?, ?>> buildsToParse = new ArrayList();
         Run<?, ?> previousBuild = build;
         for (int i = 0; i < numberOfBuilds; ++i) {
-            try {
-                results.put(parseResultsFromBuild(previousBuild));
-            } catch (InterruptedException e) {
-
-            } catch (IOException e) {
-
-            } finally {
-                previousBuild = previousBuild.getPreviousNotFailedBuild();
+            if (previousBuild.getResult() != Result.FAILURE) {
+                buildsToParse.add(previousBuild);
+            }
+            if (previousBuild.getPreviousNotFailedBuild() == null) {
+                previousBuild = previousBuild.getPreviousBuild();
                 if (previousBuild == null) {
                     break;
                 }
+            } else {
+                previousBuild = previousBuild.getPreviousNotFailedBuild();
             }
         }
-        return restructureResultsArray(results).toString();
+        for (int i = buildsToParse.size() - 1; i >= 0; i--)
+            try {
+                results.put(parseResultsFromBuild(buildsToParse.get(i)));
+            } catch (InterruptedException e) {
+            } catch (IOException e) {
+            }
+        return restructureResultsArray(results);
     }
 
     private JSONArray parseResultsFromBuild(Run<?, ?> build)
             throws InterruptedException, IOException {
         JSONArray results = new JSONArray();
-        File previousMetricsDir = new File(new File(build.getRootDir().getPath(), Paths.BASE), Paths.RESULTS);
-        FilePath[] resultsFilePaths = new FilePath(previousMetricsDir).list("*.csv");
+        File previousResultsDir = new File(new File(build.getRootDir().getPath(), Paths.BASE), Paths.RESULTS);
+        FilePath[] resultsFilePaths = new FilePath(previousResultsDir).list("*.csv");
         for (FilePath resultsFilePath : resultsFilePaths) {
             JSONObject result = parseResultsFromString(resultsFilePath.getBaseName(), resultsFilePath.readToString(), build.getNumber());
             results.put(result);
@@ -88,9 +94,6 @@ public class ArestocatsReportParserImpl implements ArestocatsReportParser {
     }
 
     private JSONArray restructureResultsArray(JSONArray results) {
-        LOGGER.log(Level.SEVERE, "---");
-        LOGGER.log(Level.SEVERE, results.toString());
-        LOGGER.log(Level.SEVERE, "---");
         JSONArray restructuredArray = new JSONArray();
         for (int i = 0; i < results.length(); ++i) {
             JSONArray resultArray = results.getJSONArray(i);
@@ -123,22 +126,98 @@ public class ArestocatsReportParserImpl implements ArestocatsReportParser {
         return restructuredArray;
     }
 
+    public JSONArray parseMetricsFromBuildsJSONArray(Run<?, ?> build, int numberOfBuilds) {
+        JSONArray metrics = new JSONArray();
+        List<Run<?, ?>> buildsToParse = new ArrayList()
+        Run<?, ?> previousBuild = build;
+        for (int i = 0; i < numberOfBuilds; ++i) {
+                if (previousBuild.getResult() != Result.FAILURE) {
+                    buildsToParse.add(previousBuild);
+                }
+                if (previousBuild.getPreviousNotFailedBuild() == null) {
+                    previousBuild = previousBuild.getPreviousBuild();
+                    if (previousBuild == null) {
+                        break;
+                    }
+                } else {
+                    previousBuild = previousBuild.getPreviousNotFailedBuild();
+                }
+        }
+        for (int i = buildsToParse.size() - 1; i >= 0; i--)
+            try {
+                metrics.put(parseMetricsFromBuild(buildsToParse.get(i)));
+            } catch (InterruptedException e) {
+            } catch (IOException e) {
+            }
+        return restructureMetricsArray(metrics);
+    }
+
     private JSONArray parseMetricsFromBuild(Run<?, ?> build)
             throws InterruptedException, IOException {
-        JSONArray metricsArray = new JSONArray();
+        JSONArray metrics = new JSONArray();
         File previousMetricsDir = new File(new File(build.getRootDir().getPath(), Paths.BASE), Paths.METRICS);
-        FilePath[] metricFilePaths = new FilePath(previousMetricsDir).list("*.json");
-        for (FilePath metricFilePath : metricFilePaths) {
-//            double metricValue;
-//            JSONArray metricDataPoint = new JSONArray();
-//            metricDataPoint.put(build.getNumber());
-//            metricDataPoint.put();
-//            JSONObject metricMeausurement = new JSONObject();
-//            metricMeausurement.put()
-//            build.getNumber();
-//            jsonArray.put()
+        FilePath[] metricsFilePaths = new FilePath(previousMetricsDir).list("*.json");
+        for (FilePath metricsFilePath : metricsFilePaths) {
+            JSONObject metric = parseMetricsFromString(metricsFilePath.getBaseName(), metricsFilePath.readToString(), build.getNumber());
+            metrics.put(metric);
         }
-        return metricsArray;
+        return metrics;
+    }
+
+    private JSONObject parseMetricsFromString(String resultName, String jsonMetrics, int buildNumber) {
+        JSONObject metricsObject = new JSONObject();
+        JSONObject inputMetrics = new JSONObject(jsonMetrics);
+
+        JSONArray names = new JSONArray();
+        JSONArray data = new JSONArray();
+        JSONArray colors = new JSONArray();
+        String label = inputMetrics.getJSONArray("metrics").getJSONObject(0).getString("label");
+        data.put(new Integer(buildNumber).toString());
+        for (int i = 0; i < inputMetrics.getJSONArray("metrics").length(); ++i) {
+            names.put(inputMetrics.getJSONArray("metrics").getJSONObject(i).getString("name"));
+            colors.put(inputMetrics.getJSONArray("metrics").getJSONObject(i).getString("color"));
+            data.put(inputMetrics.getJSONArray("metrics").getJSONObject(i).getNumber("value"));
+        }
+        metricsObject.put("names", names);
+        metricsObject.put("data", new JSONArray().put(data));
+        metricsObject.put("color", colors);
+        metricsObject.put("label", label);
+        JSONObject labeledResultObject = new JSONObject();
+        labeledResultObject.put(inputMetrics.getString("category"), metricsObject);
+        return labeledResultObject;
+    }
+
+    private JSONArray restructureMetricsArray(JSONArray metrics) {
+        JSONArray restructuredArray = new JSONArray();
+        for (int i = 0; i < metrics.length(); ++i) {
+            JSONArray resultArray = metrics.getJSONArray(i);
+            for (int j = 0; j < resultArray.length(); ++j) {
+                JSONObject metric = resultArray.getJSONObject(j);
+                assert (metric.names().length() == 1);
+                String key = metric.names().getString(0);
+                boolean resultIsPresent = false;
+                for (int k = 0; k < restructuredArray.length(); ++k) {
+                    if (restructuredArray.getJSONObject(k).has(key)) {
+                        restructuredArray
+                                .getJSONObject(k)
+                                .getJSONObject(key)
+                                .getJSONArray("data")
+                                .put(
+                                        metric
+                                                .getJSONObject(key)
+                                                .getJSONArray("data")
+                                                .getJSONArray(0)
+                                );
+                        resultIsPresent = true;
+                        break;
+                    }
+                }
+                if (!resultIsPresent) {
+                    restructuredArray.put(metric);
+                }
+            }
+        }
+        return restructuredArray;
     }
 
 }
