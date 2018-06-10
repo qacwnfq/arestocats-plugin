@@ -49,13 +49,6 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
     }
 
     @Override
-    public Collection<? extends Action> getProjectActions(AbstractProject<?, ?> project) {
-        ArestocatsProjectMetricsAction arestocatsProjectMetricsAction = new ArestocatsProjectMetricsAction(project);
-        ArestocatsProjectResultsAction arestocatsProjectResultsAction = new ArestocatsProjectResultsAction(project);
-        return Arrays.asList(arestocatsProjectResultsAction, arestocatsProjectMetricsAction);
-    }
-
-    @Override
     public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener)
             throws InterruptedException, IOException {
         listener.getLogger().println("[aRESTocats] Archiving results and metrics...");

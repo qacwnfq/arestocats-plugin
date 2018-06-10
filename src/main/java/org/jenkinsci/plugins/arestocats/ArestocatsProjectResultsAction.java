@@ -1,10 +1,12 @@
 package org.jenkinsci.plugins.arestocats;
 
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
 import hudson.model.Action;
+import hudson.model.Job;
+import hudson.model.Run;
+import hudson.util.RunList;
+import jenkins.tasks.SimpleBuildStep;
 
-import java.util.List;
+import java.util.Collection;
 
 
 /**
@@ -12,22 +14,22 @@ import java.util.List;
  */
 public class ArestocatsProjectResultsAction implements Action {
 
-    private AbstractProject<?, ?> project;
+    private Job<?, ?> project;
 
-    public ArestocatsProjectResultsAction(final AbstractProject<?, ?> project) {
+    public ArestocatsProjectResultsAction(final Job<?, ?> project) {
         this.project = project;
     }
 
     public String getResults() {
-        List<? extends AbstractBuild<?, ?>> builds = project.getBuilds();
-        AbstractBuild<?, ?> build = builds.get(0);
+        RunList<? extends Run> builds = project.getBuilds();
+        Run<?, ?> build = builds.iterator().next();
         final Class<ArestocatsResultsAction> type = ArestocatsResultsAction.class;
         return build.getAction(type).getResults();
     }
 
     public String getSummary() {
-        List<? extends AbstractBuild<?, ?>> builds = project.getBuilds();
-        AbstractBuild<?, ?> build = builds.get(0);
+        RunList<? extends Run> builds = project.getBuilds();
+        Run<?, ?> build = builds.iterator().next();
         final Class<ArestocatsResultsAction> type = ArestocatsResultsAction.class;
         return build.getAction(type).getSummary();
     }
@@ -55,7 +57,7 @@ public class ArestocatsProjectResultsAction implements Action {
         return this.project.getName();
     }
 
-    public AbstractProject<?, ?> getProject() {
+    public Job<?, ?> getProject() {
         return this.project;
     }
 

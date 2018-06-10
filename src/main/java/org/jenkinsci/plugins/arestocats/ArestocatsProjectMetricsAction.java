@@ -1,10 +1,9 @@
 package org.jenkinsci.plugins.arestocats;
 
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
 import hudson.model.Action;
-
-import java.util.List;
+import hudson.model.Job;
+import hudson.model.Run;
+import hudson.util.RunList;
 
 
 /**
@@ -12,15 +11,15 @@ import java.util.List;
  */
 public class ArestocatsProjectMetricsAction implements Action {
 
-    private AbstractProject<?, ?> project;
+    private Job<?, ?> project;
 
-    public ArestocatsProjectMetricsAction(final AbstractProject<?, ?> project) {
+    public ArestocatsProjectMetricsAction(final Job<?, ?> project) {
         this.project = project;
     }
 
     public String getMetrics() {
-        List<? extends AbstractBuild<?, ?>> builds = project.getBuilds();
-        AbstractBuild<?, ?> build = builds.get(0);
+        RunList<? extends Run> builds = project.getBuilds();
+        Run<?, ?> build = builds.iterator().next();
         final Class<ArestocatsMetricsAction> type = ArestocatsMetricsAction.class;
         return build.getAction(type).getMetrics();
     }
@@ -48,7 +47,7 @@ public class ArestocatsProjectMetricsAction implements Action {
         return this.project.getName();
     }
 
-    public AbstractProject<?, ?> getProject() {
+    public Job<?, ?> getProject() {
         return this.project;
     }
 

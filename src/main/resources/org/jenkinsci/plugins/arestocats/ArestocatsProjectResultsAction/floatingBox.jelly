@@ -1,7 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:c="chart" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
-            <!--Load the AJAX API for google charts-->
-            <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
             <script type="text/javascript">
                var results = [${it.summary}];
                var charts = [];
@@ -20,6 +19,7 @@
                     data.addRows(measurements['data']);
                      var options = {
                          'title': 'aRESTocats test-summary',
+                         containerId: 'summary',
                          isStacked: true,
                          chartArea: {
                              left: 100,
@@ -33,12 +33,9 @@
                              title: 'test-cases'
                          }
                      };
-                     var div = document.createElement( "div" );
-                     div.setAttribute( "id", testcase );
-                     document.getElementById( "main-panel" ).appendChild( div );
-                     var chart = new google.visualization.AreaChart( document.getElementById( testcase ) );
+                     var chart = new google.visualization.AreaChart( document.getElementById( 'summary' ) );
                      chart.draw( data, options );
-                     charts.push( chart );
+                     charts.push(chart);
                   } );
                }
             </script>
