@@ -1,13 +1,9 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:c="chart" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
-   <l:layout norefresh="true">
-      <st:include it="${it.project}" page="sidepanel.jelly" />
-         <l:main-panel>
-            <h1>${%Latest aRESTocats Results}</h1>
             <!--Load the AJAX API for google charts-->
             <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
             <script type="text/javascript">
-               var results = ${it.results};
+               var results = [${it.summary}];
                var charts = [];
                google.charts.load('current', {'packages':['corechart']});
                google.charts.setOnLoadCallback(drawCharts);
@@ -21,9 +17,9 @@
                      labeling.forEach( label => {
                      data.addColumn( 'number', label );
                      });
-                    data.addRows(measurements["data"]);
+                    data.addRows(measurements['data']);
                      var options = {
-                         'title': testcase,
+                         'title': 'aRESTocats test-summary',
                          isStacked: true,
                          chartArea: {
                              left: 100,
@@ -46,6 +42,4 @@
                   } );
                }
             </script>
-        </l:main-panel>
-    </l:layout>
 </j:jelly>

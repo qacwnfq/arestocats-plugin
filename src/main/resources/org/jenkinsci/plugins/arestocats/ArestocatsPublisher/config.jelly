@@ -10,7 +10,7 @@
         <f:textbox />
     </f:entry>
     <f:entry title="${%Number of builds to include}" help="/plugin/arestocats/help-numbuilds.html">
-          <input class="positive-number" type="text" name="numBuilds"
-                 style="width:20em" value="${plot.numBuilds}" default="15"/>
+          <input class="positive-number" type="number" name="number of Builds"
+                 style="width:20em"/>
     </f:entry>
 </j:jelly>

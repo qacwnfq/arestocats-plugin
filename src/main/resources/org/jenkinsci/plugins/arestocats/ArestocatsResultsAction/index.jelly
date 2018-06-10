@@ -24,6 +24,7 @@
                     data.addRows(measurements["data"]);
                      var options = {
                          'title': testcase,
+                         isStacked: true,
                          chartArea: {
                              left: 100,
                              width: 600
@@ -39,7 +40,7 @@
                      var div = document.createElement( "div" );
                      div.setAttribute( "id", testcase );
                      document.getElementById( "main-panel" ).appendChild( div );
-                     var chart = new google.visualization.LineChart( document.getElementById( testcase ) );
+                     var chart = new google.visualization.AreaChart( document.getElementById( testcase ) );
                      chart.draw( data, options );
                      charts.push( chart );
                   } );

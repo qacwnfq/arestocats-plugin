@@ -27,7 +27,6 @@ import jenkins.tasks.SimpleBuildStep;
  */
 public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
 
-    // private static transient final Logger LOGGER = Logger.getLogger(ArestocatsPublisher.class.getName());
     private final ArestocatsChartHandler arestocatsChartHandler = new ArestocatsChartHandler();
     private final ArestocatsDataRecorder arestocatsDataRecorder = new ArestocatsDataRecorder();
     /**
@@ -38,19 +37,15 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
      * {@link FileSet} "includes" string, like "foo/bar/*.xml"
      */
     private String resultsDatafilesPattern = "reports/csv/*.csv";
-    private int numberOfBuildsToArchive;
+    private int numberOfBuildsToArchive = 15;
 
     @DataBoundConstructor
     public ArestocatsPublisher(String metricsDatafilesPattern, String resultsDatafilesPattern, Integer numBuilds) {
         this.metricsDatafilesPattern = metricsDatafilesPattern.trim();
         this.resultsDatafilesPattern = resultsDatafilesPattern.trim();
-        int _numBuilds;
-        try {
-            _numBuilds = numBuilds;
-        } catch (NullPointerException e) {
-            _numBuilds = 15;
+        if(numBuilds != null) {
+            this.numberOfBuildsToArchive = numBuilds;
         }
-        this.numberOfBuildsToArchive = _numBuilds;
     }
 
     @Override
@@ -63,7 +58,9 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
     @Override
     public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener)
             throws InterruptedException, IOException {
+        listener.getLogger().println("[aRESTocats] Archiving results and metrics...");
         Integer returnStatusOfRecording = arestocatsDataRecorder.recordResultsAndMetrics(build, workspace, this.resultsDatafilesPattern, this.metricsDatafilesPattern);
+        listener.getLogger().println("[aRESTocats] Creating  plots...");
         Integer returnStatusOfChartHandling = arestocatsChartHandler.registerChartsForResultsAndMetrics(build, this.numberOfBuildsToArchive);
         if (Math.min(returnStatusOfRecording, returnStatusOfChartHandling) == Integer.valueOf(1)) {
             build.setResult(Result.SUCCESS);
@@ -109,5 +106,17 @@ public class ArestocatsPublisher extends Recorder implements SimpleBuildStep {
             return true;
         }
 
+    }
+
+    String getResultsDatafilesPattern() {
+        return resultsDatafilesPattern;
+    }
+
+    String getMetricsDatafilesPattern() {
+        return metricsDatafilesPattern;
+    }
+
+    int getNumberOfBuildsToArchive() {
+        return numberOfBuildsToArchive;
     }
 }

@@ -25,6 +25,13 @@ public class ArestocatsProjectResultsAction implements Action {
         return build.getAction(type).getResults();
     }
 
+    public String getSummary() {
+        List<? extends AbstractBuild<?, ?>> builds = project.getBuilds();
+        AbstractBuild<?, ?> build = builds.get(0);
+        final Class<ArestocatsResultsAction> type = ArestocatsResultsAction.class;
+        return build.getAction(type).getSummary();
+    }
+
     @Override
     public String getIconFileName() {
         return "graph.gif";
