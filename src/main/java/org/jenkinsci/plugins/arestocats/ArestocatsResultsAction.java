@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author fjadebeck
  */
-public class ArestocatsResultsAction implements RunAction2, SimpleBuildStep.LastBuildAction {
+public class ArestocatsResultsAction implements Action, SimpleBuildStep.LastBuildAction {
 
     private Run<?, ?> build;
 
@@ -66,15 +66,6 @@ public class ArestocatsResultsAction implements RunAction2, SimpleBuildStep.Last
 
     public Run<?, ?> getRun() {
         return build;
-    }
-
-    @Override
-    public void onAttached(Run<?, ?> r) {
-       this.build = r;
-    }
-    @Override
-    public void onLoad(Run<?, ?> r) {
-        this.build = r;
     }
 
 

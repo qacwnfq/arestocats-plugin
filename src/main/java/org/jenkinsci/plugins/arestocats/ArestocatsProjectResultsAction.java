@@ -4,9 +4,7 @@ import hudson.model.Action;
 import hudson.model.Job;
 import hudson.model.Run;
 import hudson.util.RunList;
-import jenkins.tasks.SimpleBuildStep;
 
-import java.util.Collection;
 
 
 /**
