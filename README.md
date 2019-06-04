@@ -1,4 +1,5 @@
 # arestocats-plugin
+TEST SNYK
 Jenkins-Plugin for tracking results metrics created with the
 aRESTocats REST API testing toolkit available at
 https://github.com/aixigo/arestocats.
